@@ -111,7 +111,7 @@ local function config()
     vim.api.nvim_exec([[
         augroup INITRC
         autocmd!
-        autocmd FileType java,cpp,python,c,sh,lua,go :lua require('keymap').programming()
+        autocmd FileType java,cpp,python,c,sh,lua,go :lua require('keymap').lsp()
         augroup END
     ]], false)
 end

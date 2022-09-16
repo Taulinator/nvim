@@ -45,6 +45,8 @@ require('plugins/lsp').setup(registerPlugin)
 require('plugins/telescope').setup(registerPlugin)
 --Treesitter
 require('plugins/treesitter').setup(registerPlugin)
+--File browser
+require('plugins/nvim-tree').setup(registerPlugin)
 --markdown preview
 registerPlugin({'iamcco/markdown-preview.nvim', run=vim.fn['mkdp#util#install']})
 --git blame inline
@@ -53,13 +55,8 @@ registerPlugin({'f-person/git-blame.nvim'})
 ----------------LOOK----------------
 --colorscheme
 require('plugins/onenord').setup(registerPlugin)
---icons, currently only used by onenord
-registerPlugin({'kyazdani42/nvim-web-devicons'})
 --top and bottom line
 require('plugins/lualine').setup(registerPlugin)
---dart coloring
-registerPlugin({'dart-lang/dart-vim-plugin'})
-
 ---Profiling
 registerPlugin({'dstein64/vim-startuptime'})
 
@@ -82,8 +79,6 @@ end
 
 --]]
 local keymap = require('keymap')
-keymap.telescope()
-keymap.terminal()
 keymap.defaultKeymap()
 
 

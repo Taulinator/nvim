@@ -16,6 +16,12 @@ local function config()
             },
         }
     }
+    local keymap
+    ok, keymap = pcall(require, 'keymap')
+    if ok then
+        keymap.telescope()
+    end
+
 end
 
 local M = {}

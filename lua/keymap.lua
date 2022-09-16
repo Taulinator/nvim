@@ -23,14 +23,8 @@ function M.tabComplete()
 end
 
 
-function M.terminal()
-    api.nvim_set_keymap('t', '<Esc>', '<C-\\><C-n>', { noremap = true, silent = true})
-    api.nvim_set_keymap('n', '<C-t>1', '<cmd>lua require("terminator").openWin(1)<CR>',{ noremap = true, silent = true})
-    api.nvim_set_keymap('n', '<C-t>2', '<cmd>lua require("terminator").openWin(2)<CR>',{ noremap = true, silent = true})
-    api.nvim_set_keymap('n', '<C-t>3', '<cmd>lua require("terminator").openWin(3)<CR>',{ noremap = true, silent = true})
-    api.nvim_set_keymap('n', '<C-t>4', '<cmd>lua require("terminator").openWin(4)<CR>',{ noremap = true, silent = true})
-    api.nvim_set_keymap('n', '<C-t>t', '<cmd>lua require("terminator").toggleWin()<CR>',{ noremap = true, silent = true})
-    api.nvim_set_keymap('t', '<C-t>t', '<cmd>lua require("terminator").toggleWin()<CR>',{ noremap = true, silent = true})
+function M.filebrowser()
+    api.nvim_set_keymap('n', '<leader>d', '<cmd>lua require("nvim-tree.api").tree.toggle()<CR>', { noremap = true, silent = true})
 end
 
 
@@ -52,22 +46,6 @@ function M.lsp()
     api.nvim_buf_set_keymap(0, 'n', '<leader>l', '<cmd>lua vim.lsp.buf.hover()<CR>', {noremap = true, silent = true})
     api.nvim_buf_set_keymap(0, 'n', '<leader>ll', '<cmd>lua vim.lsp.buf.references()<CR>', {noremap = true, silent = true})
 end
-
-function M.debug()
-  api.  nvim_buf_set_keymap(0, 'n', '<F7>', '<Plug>VimspectorToggleBreakpoint<CR>', {noremap = false, silent = true})
-    api.nvim_buf_set_keymap(0, 'n', '<F8>', '<Plug>VimspectorToggleConditionalBreakpoint<CR>', {noremap = false, silent = true})
-    api.nvim_buf_set_keymap(0, 'n', '<F6>', '<Plug>VimspectorContinue<CR>', {noremap = false, silent = true})
-    api.nvim_buf_set_keymap(0, 'n', '<leader>dq', ':call vimspector#Reset()<CR>', {noremap = true, silent = true})
-    api.nvim_buf_set_keymap(0, 'n', '<leader>dw', ':call win_gotoid(g:vimspector_session_windows.watches)<CR>', {noremap = true, silent = true})
-end
-
-function M.programming()
-    M.lsp()
-    M.debug()
-end
-
-
-
 
 api.nvim_exec([[
     function OpenPDFReader() abort
