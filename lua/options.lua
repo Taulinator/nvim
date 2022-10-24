@@ -107,5 +107,8 @@ setGlobalOption('termguicolors', true)
 --Enable undofile 
 setGlobalOption('undofile', true)
 
+--Dont show cmd unless used
+setGlobalOption('cmdheight', 0)
+
 --use the filetype plugin to detect languages
 vim.api.nvim_command('filetype on')
