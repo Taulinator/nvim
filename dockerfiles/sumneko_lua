@@ -1,0 +1,26 @@
+FROM docker.io/library/alpine:latest as build
+
+RUN apk add --no-cache \
+  bash \
+  g++ \
+  gcc \
+  git \
+  ninja
+
+WORKDIR /build
+
+RUN git clone --depth 1 https://github.com/sumneko/lua-language-server \
+  && cd lua-language-server \
+  && git submodule update --init --recursive \
+  && ninja -C 3rd/luamake -f compile/ninja/linux.ninja \
+  && ./3rd/luamake/luamake rebuild
+
+FROM docker.io/library/alpine:latest
+
+RUN addgroup -S lsp && adduser -S lsp -G lsp
+
+WORKDIR /home/lsp
+
+COPY --from=build /build/lua-language-server .
+
+CMD [ "/home/lsp/bin/lua-language-server", "-E", "/home/lsp/bin/main.lua" ]

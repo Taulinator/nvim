@@ -1,0 +1,13 @@
+FROM docker.io/library/alpine:latest
+
+RUN addgroup -S lsp && adduser -S lsp -G lsp
+
+WORKDIR /home/lsp
+
+RUN apk add --no-cache \
+    build-base \
+    clang-extra-tools
+
+USER lsp
+
+CMD [ "clangd", "--background-index" ]

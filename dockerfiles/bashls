@@ -1,0 +1,17 @@
+FROM docker.io/library/alpine:latest
+
+RUN addgroup -S lsp && adduser -S lsp -G lsp
+
+WORKDIR /home/lsp
+
+RUN apk add --no-cache \
+  man-pages \
+  bash \
+  nodejs \
+  npm \
+  && npm install -g \
+    bash-language-server
+
+USER lsp
+
+CMD [ "bash-language-server", "start" ]
