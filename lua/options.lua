@@ -78,7 +78,7 @@ setGlobalOption('scrolloff', 8)
 setGlobalOption('shiftwidth', 4)
 
 --Dont show intro message, dont give completion messages
-setGlobalOption('shortmess', 'Ic')
+setGlobalOption('shortmess', 'IFc')
 
 --Use 4spaces for tab
 setGlobalOption('tabstop', 4)
