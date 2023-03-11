@@ -78,7 +78,7 @@ local function config()
     table.insert(runtime_path, "lua/?.lua")
     table.insert(runtime_path, "lua/?/init.lua")
 
-    lsp.sumneko_lua.setup {
+    lsp.lua_ls.setup {
       cmd = getContainerCmd({
           image = 'sumneko_lua',
           mounts = {vim.fn.expand('~/.config/nvim')}
