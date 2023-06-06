@@ -5,7 +5,7 @@ local function config()
     end
 
     sitter.setup{
-        ensure_installed = {"java", "python", "cpp", "dart", "latex", "bash", "javascript", "lua", "go"},
+        ensure_installed = {"java", "dart", "latex", "javascript", "lua", "go"},
         highlight = {
             enable = true,
             additional_vim_regex_highlighting = false,
