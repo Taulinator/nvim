@@ -12,8 +12,15 @@ local function config()
     if not ok then
         return
     end
+    local ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
+    if not ok then
+        return
+    end
 
-    local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+
+    local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    local set_keymap = require('keymap').lsp
 
     local runtime_path = vim.split(package.path, ';')
     table.insert(runtime_path, "lua/?.lua")
@@ -42,12 +49,19 @@ local function config()
                 },
             },
         },
-        capabilities = capabilities
+        capabilities = capabilities,
+	 on_attach = set_keymap
     }
 
     lsp.bashls.setup{
         cmd = {"bash-language-server", "start"},
-        capabilities = capabilities
+        capabilities = capabilities,
+	 on_attach = set_keymap
+    }
+    lsp.dockerls.setup{
+	 cmd = {},
+	 capabilities = capabilities,
+	 on_attach = set_keymap
     }
 
     lsp.gopls.setup{
@@ -57,7 +71,8 @@ local function config()
                 allowImplicitNetworkAccess = true
             }
         },
-        capabilities = capabilities
+        capabilities = capabilities,
+        on_attach = set_keymap
     }
 
     lsp.pylsp.setup{
@@ -71,7 +86,8 @@ local function config()
                 }
             }
         },
-        capabilities = capabilities
+        capabilities = capabilities,
+        on_attach = set_keymap
     }
 
     lsp.texlab.setup{
@@ -101,14 +117,10 @@ local function config()
                 }
             }
         },
-        capabilities = capabilities
+        capabilities = capabilities,
+        on_attach = set_keymap
+
     }
-
-    vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-        callback = require('keymap').lsp
-    })
-
 end
 
 local M = {}

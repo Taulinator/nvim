@@ -15,7 +15,7 @@ function M.defaultKeymap()
 end
 
 function M.tabComplete()
-    keymap.set('i', '<tab>', 'pumvisible() ? "<c-n>" : "<tab>"', {noremap = true, expr = true})
+    keymap.set('i', '<tab>', function() return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>" end, {noremap = true, expr = true})
 end
 
 function M.filebrowser()
@@ -37,8 +37,8 @@ function M.telescope()
     keymap.set('n', '<leader>c', telescope.git_status, opts)
 end
 
-function M.lsp()
-    local opts = {noremap = true, silent = true, buffer = true}
+function M.lsp(server, bufnr)
+    local opts = {noremap = true, silent = true, buffer = bufnr}
     keymap.set('n', '<leader>ld', vim.lsp.buf.definition, opts)
     keymap.set('n', '<leader>lr', vim.lsp.buf.rename, opts)
     keymap.set('n', '<F5>', vim.lsp.buf.code_action, opts)

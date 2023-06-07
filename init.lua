@@ -61,7 +61,7 @@ require('plugins/lualine').setup(registerPlugin)
 registerPlugin({'dstein64/vim-startuptime'})
 
 require('paq')(packages)
-for i, config in pairs(configCallbacks) do
+for _, config in pairs(configCallbacks) do
     config()
 end
 
