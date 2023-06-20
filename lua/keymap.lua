@@ -37,8 +37,8 @@ function M.telescope()
     keymap.set('n', '<leader>c', telescope.git_status, opts)
 end
 
-function M.lsp(server, bufnr)
-    local opts = {noremap = true, silent = true, buffer = bufnr}
+function M.lsp(args)
+    local opts = {noremap = true, silent = true, buffer = args.buf}
     keymap.set('n', '<leader>ld', vim.lsp.buf.definition, opts)
     keymap.set('n', '<leader>lr', vim.lsp.buf.rename, opts)
     keymap.set('n', '<F5>', vim.lsp.buf.code_action, opts)

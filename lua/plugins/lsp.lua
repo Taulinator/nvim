@@ -1,131 +1,158 @@
 local function disableProcessIdDetection(params)
     params.processId = vim.NIL
 end
-
-
-local function config()
-    local ok, lsp = pcall(require, 'lspconfig')
-    if not ok then
-        return
-    end
-    local ok, util = pcall(require, 'lspconfig/util')
-    if not ok then
-        return
-    end
-    local ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
-    if not ok then
-        return
-    end
-
-
-
-    local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-    local set_keymap = require('keymap').lsp
-
-    local runtime_path = vim.split(package.path, ';')
-    table.insert(runtime_path, "lua/?.lua")
-    table.insert(runtime_path, "lua/?/init.lua")
-    lsp.lua_ls.setup {
-        cmd = {"lua-language-server"},
-        settings = {
-            Lua = {
-                runtime = {
-                    -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                    version = 'LuaJIT',
-                    -- Setup your lua path
-                    path = runtime_path,
-                },
-                diagnostics = {
-                    -- Get the language server to recognize the `vim` global
-                    globals = {'vim'},
-                },
-                workspace = {
-                    -- Make the server aware of Neovim runtime files
-                    library = vim.api.nvim_get_runtime_file("", true),
-                },
-                -- Do not send telemetry data containing a randomized but unique identifier
-                telemetry = {
-                    enable = false,
-                },
-            },
-        },
-        capabilities = capabilities,
-	 on_attach = set_keymap
-    }
-
-    lsp.bashls.setup{
-        cmd = {"bash-language-server", "start"},
-        capabilities = capabilities,
-	 on_attach = set_keymap
-    }
-    lsp.dockerls.setup{
-	 cmd = {},
-	 capabilities = capabilities,
-	 on_attach = set_keymap
-    }
-
-    lsp.gopls.setup{
-        cmd = {"gopls", "serve"},
-        settings = {
-            gopls = {
-                allowImplicitNetworkAccess = true
-            }
-        },
-        capabilities = capabilities,
-        on_attach = set_keymap
-    }
-
-    lsp.pylsp.setup{
-        cmd = {"pylsp"},
-        settings = {
-            plugins = {
-                jedi_completion = {
-                    include_class_objects = true,
-                    include_function_objects = true,
-                    eager = true
-                }
-            }
-        },
-        capabilities = capabilities,
-        on_attach = set_keymap
-    }
-
-    lsp.texlab.setup{
-        cmd = {"texlab"},
-        settings = {
-            texlab = {
-                auxDirectory = ".",
-                bibtexFormatter = "texlab",
-                build = {
-                    args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
-                        executable = "latexmk",
-                        forwardSearchAfter = false,
-                        onSave = true
-                },
-                chktex = {
-                    onEdit = true,
-                    onOpenAndSave = false
-                },
-                diagnosticsDelay = 300,
-                formatterLineLength = 80,
-                forwardSearch = {
-                    args = {}
-                },
-                latexFormatter = "latexindent",
-                latexindent = {
-                    modifyLineBreaks = false
-                }
-            }
-        },
-        capabilities = capabilities,
-        on_attach = set_keymap
-
-    }
+local function findRootPath(files)
+    return vim.fs.dirname(vim.fs.find(files)[1])
 end
+local lsp = vim.api.nvim_create_augroup("LSP", { clear = true })
 
 local M = {}
-function M.setup(registerPlugin)
-    registerPlugin({'neovim/nvim-lspconfig'})
-    registerPlugin.callbackConfig(config)
+
+function M.sh()
+    vim.api.nvim_create_autocmd("FileType",{
+    group = lsp,
+    pattern = "sh",
+    callback = function()
+        vim.lsp.start({
+            name = "bashls",
+            cmd = {"bash-language-server", "start"},
+            root_dir = findRootPath({ ".git" }),
+            settings = {
+                bashIde = {
+                    globPattern = vim.env.GLOB_PATTERN or '*@(.sh|.inc|.bash|.command)',
+                }
+            }
+        })
+    end })
+end
+function M.dockerfile()
+    vim.api.nvim_create_autocmd("FileType",{
+    group = lsp,
+    pattern = "dockerfile",
+    callback = function()
+    vim.lsp.start({
+            name = "dockerls",
+            cmd = { "docker-langserver", "--stdio" },
+            root_dir = findRootPath({ "Dockerfile" }),
+        })
+    end })
+end
+function M.go()
+    vim.api.nvim_create_autocmd("FileType",{
+    group = lsp,
+    pattern = { "go", "gomod", "gowork", "gotmpl" },
+    callback = function()
+        vim.lsp.start({
+            name = "gopls",
+            cmd = { "gopls", "serve" },
+            root_dir = findRootPath({ "go.work", "go.mod", ".git" }),
+            settings = {
+                gopls = {
+                    allowImplicitNetworkAccess = true
+                }
+            }
+        })
+    end })
+end
+function M.python()
+    vim.api.nvim_create_autocmd("FileType",{
+    group = lsp,
+    pattern = "python",
+    callback = function()
+        vim.lsp.start({
+            name = "pylsp",
+            cmd = { "pylsp" },
+            root_dir = findRootPath({ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", ".git" }),
+            settings = {
+                plugins = {
+                    jedi_completion = {
+                        include_class_objects = true,
+                        include_function_objects = true,
+                        eager = true
+                    }
+                }
+            },
+        })
+    end })
+end
+function M.latex()
+    vim.api.nvim_create_autocmd("FileType",{
+    group = lsp,
+    pattern = { "tex", "plaintex", "bib" },
+    callback = function()
+        vim.lsp.start({
+            name = "texlab",
+            cmd = { "texlab" },
+            root_dir = findRootPath({ ".latexmkrc", ".git" }),
+            settings = {
+                texlab = {
+                    auxDirectory = ".",
+                    bibtexFormatter = "texlab",
+                    build = {
+                        args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
+                            executable = "latexmk",
+                            forwardSearchAfter = false,
+                            onSave = true
+                    },
+                    chktex = {
+                        onEdit = true,
+                        onOpenAndSave = false
+                    },
+                    diagnosticsDelay = 300,
+                    formatterLineLength = 80,
+                    forwardSearch = {
+                        args = {}
+                    },
+                    latexFormatter = "latexindent",
+                    latexindent = {
+                        modifyLineBreaks = false
+                    }
+                }
+            }
+        })
+    end})
+end
+function M.lua()
+    vim.api.nvim_create_autocmd("FileType",{
+    group = lsp,
+    pattern = "lua",
+    callback = function()
+        local runtime_path = vim.split(package.path, ';')
+        table.insert(runtime_path, "lua/?.lua")
+        table.insert(runtime_path, "lua/?/init.lua")
+        vim.lsp.start({
+            name = 'lua',
+            cmd = {"lua-language-server"},
+            root_dir = findRootPath({ ".luarc.json", ".luacheckrc", "stylua.toml", ".git" }),
+            settings = {
+                Lua = {
+                    runtime = {
+                        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+                        version = 'LuaJIT',
+                        -- Setup your lua path
+                        path = runtime_path,
+                    },
+                    diagnostics = {
+                        -- Get the language server to recognize the `vim` global
+                        globals = {'vim'},
+                    },
+                    workspace = {
+                        -- Make the server aware of Neovim runtime files
+                        library = vim.api.nvim_get_runtime_file("", true),
+                    },
+                    -- Do not send telemetry data containing a randomized but unique identifier
+                    telemetry = {
+                        enable = false,
+                    },
+                },
+            }
+        })
+    end })
+end
+
+function M.config()
+    vim.api.nvim_create_autocmd('LspAttach', {
+        callback = require('keymap').lsp
+    })
 end
 return M
