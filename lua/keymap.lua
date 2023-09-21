@@ -46,4 +46,12 @@ function M.lsp(args)
     keymap.set('n', '<leader>ll', vim.lsp.buf.references, opts)
 end
 
+function M.symbols_outline()
+    local ok, symbols_outline = pcall(require, 'symbols-outline')
+    if not ok then
+        return
+    end
+    keymap.set('n', '<leader>o', symbols_outline.toggle_outline, {noremap = true, silent = true})
+end
+
 return M

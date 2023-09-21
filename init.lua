@@ -58,6 +58,8 @@ require('plugins/nvim-tree').setup(registerPlugin)
 registerPlugin({'iamcco/markdown-preview.nvim', run=vim.fn['mkdp#util#install']})
 --git blame inline
 registerPlugin({'f-person/git-blame.nvim'})
+--symbols-outline
+require('plugins/symbols-outline').setup(registerPlugin)
 
 ----------------LOOK----------------
 --colorscheme
