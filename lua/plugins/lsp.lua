@@ -6,9 +6,8 @@ local function findRootPath(files)
 end
 local lsp = vim.api.nvim_create_augroup("LSP", { clear = true })
 
-local M = {}
 
-function M.sh()
+local function sh()
     vim.api.nvim_create_autocmd("FileType",{
     group = lsp,
     pattern = "sh",
@@ -25,7 +24,7 @@ function M.sh()
         })
     end })
 end
-function M.dockerfile()
+local function dockerfile()
     vim.api.nvim_create_autocmd("FileType",{
     group = lsp,
     pattern = "dockerfile",
@@ -37,7 +36,7 @@ function M.dockerfile()
         })
     end })
 end
-function M.go()
+local function go()
     vim.api.nvim_create_autocmd("FileType",{
     group = lsp,
     pattern = { "go", "gomod", "gowork", "gotmpl" },
@@ -54,7 +53,7 @@ function M.go()
         })
     end })
 end
-function M.python()
+local function python()
     vim.api.nvim_create_autocmd("FileType",{
     group = lsp,
     pattern = "python",
@@ -75,7 +74,7 @@ function M.python()
         })
     end })
 end
-function M.latex()
+local function latex()
     vim.api.nvim_create_autocmd("FileType",{
     group = lsp,
     pattern = { "tex", "plaintex", "bib" },
@@ -112,7 +111,7 @@ function M.latex()
         })
     end})
 end
-function M.lua()
+local function lua()
     vim.api.nvim_create_autocmd("FileType",{
     group = lsp,
     pattern = "lua",
@@ -149,10 +148,86 @@ function M.lua()
         })
     end })
 end
+local function java()
+  vim.api.nvim_create_autocmd("FileType", {
+    group = lsp,
+    pattern = "java",
+    callback = function ()
+      require('jdtls').start_or_attach({
+        cmd = {
+          '/usr/lib/jvm/java-17-openjdk/bin/java',
+          '-Declipse.application=org.eclipse.jdt.ls.core.id1',
+          '-Dosgi.bundles.defaultStartLevel=4',
+          '-Declipse.product=org.eclipse.jdt.ls.core.product',
+          '-Dlog.protocol=true',
+          '-Dlog.level=ALL',
+          '-Xmx1g',
+          '--add-modules=ALL-SYSTEM',
+          '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+          '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+          '-jar', '/opt/jdtls/plugins/org.eclipse.equinox.launcher_1.6.500.v20230717-2134.jar',
+          '-configuration', '/opt/jdtls/config_linux',
+          '-data', '/home/dev/project/.workspace'
+        },
+        root_dir = require('jdtls.setup').find_root({'.git', 'mvnw', 'gradlew'}),
+        settings = {
+          java = {
+            configuration = {
+              runtimes = {
+                {
+                  name = "JavaSE-11",
+                  path = "/usr/lib/jvm/java-11-openjdk"
+                },
+                {
+                  name = "JavaSE-12",
+                  path = "/usr/lib/jvm/java-12-openjdk"
+                },
+                {
+                  name = "JavaSE-13",
+                  path = "/usr/lib/jvm/java-13-openjdk"
+                },
+                {
+                  name = "JavaSE-14",
+                  path = "/usr/lib/jvm/java-14-openjdk"
+                },
+                {
+                  name = "JavaSE-15",
+                  path = "/usr/lib/jvm/java-15-openjdk"
+                },
+                {
+                  name = "JavaSE-16",
+                  path = "/usr/lib/jvm/java-16-openjdk"
+                },
+                {
+                  name = "JavaSE-17",
+                  path = "/usr/lib/jvm/java-17-openjdk"
+                }
+              }
+            }
+          }
+        }
+      })
+    end
+  })
+end
 
-function M.config()
-    vim.api.nvim_create_autocmd('LspAttach', {
-        callback = require('keymap').lsp
-    })
+local function config()
+  sh()
+  dockerfile()
+  go()
+  python()
+  latex()
+  lua()
+  java()
+  vim.api.nvim_create_autocmd('LspAttach', {
+    callback = require('keymap').lsp
+  })
+end
+
+
+local M = {}
+function M.setup(registerPlugin)
+  registerPlugin({'mfussenegger/nvim-jdtls'})
+  registerPlugin.callbackConfig(config)
 end
 return M

@@ -40,14 +40,7 @@ registerPlugin({'savq/paq-nvim', opt= true})
 --completion framework
 require('plugins/nvim-cmp').setup(registerPlugin)
 --LSP configuration
-local lspServer = require('plugins/lsp')
-lspServer.lua()
-lspServer.go()
-lspServer.sh()
-lspServer.latex()
-lspServer.python()
-lspServer.dockerfile()
-lspServer.config()
+require('plugins/lsp').setup(registerPlugin)
 --telescope/fzf
 require('plugins/telescope').setup(registerPlugin)
 --Treesitter
